@@ -74,7 +74,7 @@ class BaseCharacter extends Bopper
    */
   public var dropNoteCounts(default, null):Array<Int>;
 
-  @:allow(funkin.ui.debug.anim.DebugBoundingState)
+  @:allow(funkin.ui.debug.character.DebugBoundingState)
   final _data:CharacterData;
   /**
    * The amount of time, in seconds, that the character's singing animations should last for.
@@ -367,6 +367,8 @@ class BaseCharacter extends Bopper
 
   public function initHealthIcon(isOpponent:Bool):Void
   {
+    if (PlayState.instance == null) return;
+
     if (!isOpponent)
     {
       if (PlayState.instance.iconP1 == null)

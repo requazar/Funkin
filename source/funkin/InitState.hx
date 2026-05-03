@@ -418,9 +418,9 @@ class InitState extends FlxState
         // 190 total notes = PERFECT
       },
     }));
-    #elseif ANIMDEBUG
-    // -DANIMDEBUG
-    FlxG.switchState(() -> new funkin.ui.debug.anim.DebugBoundingState());
+    #elseif CHARDEBUG
+    // -DCHARDEBUG
+    FlxG.switchState(() -> new funkin.ui.debug.character.CharacterEditorState());
     #elseif LATENCY
     // -DLATENCY
     FlxG.switchState(() -> new funkin.LatencyState());

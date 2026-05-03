@@ -130,9 +130,9 @@
       "args": ["-debug", "-DSTAGEBUILD", "-DFEATURE_DEBUG_FUNCTIONS"]
     },
     {
-      "label": "Windows / Debug (Straight to Animation Editor)",
+      "label": "Windows / Debug (Straight to Character Editor)",
       "target": "windows",
-      "args": ["-debug", "-DANIMDEBUG", "-DFEATURE_DEBUG_FUNCTIONS"]
+      "args": ["-debug", "-DCHARDEBUG", "-DFEATURE_DEBUG_FUNCTIONS"]
     },
     {
       "label": "Windows / Debug (Debug hxvlc)",

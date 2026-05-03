@@ -1,6 +1,6 @@
-package funkin.ui.debug.anim;
+package funkin.ui.debug.character;
 
-#if FEATURE_ANIMATION_EDITOR
+#if FEATURE_CHARACTER_EDITOR
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.display.FlxGridOverlay;
 import flixel.FlxCamera;
@@ -73,7 +73,7 @@ class DebugBoundingState extends FlxState
     // we are setting this as the default draw camera only temporarily, to trick haxeui
     FlxG.cameras.add(hudCam);
 
-    var str = Paths.xml('ui/animation-editor/offset-editor-view');
+    var str = Paths.xml('ui/character-editor/offset-editor-view');
     offsetEditorDialog = cast RuntimeComponentBuilder.fromAsset(str);
 
     // offsetEditorDialog.findComponent("btnViewSpriteSheet").onClick = _ -> curView = SPRITESHEET;
