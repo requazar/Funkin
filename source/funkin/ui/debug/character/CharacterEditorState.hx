@@ -1,10 +1,13 @@
 package funkin.ui.debug.character;
 
+import funkin.ui.debug.character.dialogs.CharacterEditorWelcomeDialog;
+import flixel.math.FlxPoint;
 import funkin.play.stage.Stage;
 import funkin.graphics.FunkinCamera;
 import funkin.util.WindowUtil;
 import funkin.play.character.BaseCharacter;
 import funkin.data.character.CharacterData;
+import funkin.ui.debug.character.toolboxes.CharacterEditorBaseToolbox;
 import haxe.ui.containers.windows.WindowManager;
 import haxe.ui.backend.flixel.UIState;
 import haxe.ui.focus.FocusManager;
@@ -12,15 +15,21 @@ import funkin.audio.FunkinSound;
 import funkin.util.MouseUtil;
 import haxe.ui.core.Screen;
 import funkin.input.Cursor;
+import flixel.FlxObject;
 
 /**
  * Animation Editor if it wasn't larping as a usable editor
  *
- * By TilNotDrip & ADA-Funni
+ * By TilNotDrip & ADA_Funni
  */
 @:build(haxe.ui.ComponentBuilder.build('assets/exclude/data/ui/character-editor/main-view.xml'))
 class CharacterEditorState extends UIState
 {
+  /**
+   * Default Position the character is placed in.
+   */
+  public static final DEFAULT_CHARACTER_POSITION:CharacterType = DAD;
+
   /**
    * The current instance of the Character Editor.
    */
@@ -39,6 +48,24 @@ class CharacterEditorState extends UIState
   public var currentStage:Stage;
 
   /**
+   * The main focus point of the camera.
+   */
+  public var camFollow:FlxObject;
+
+  /**
+   * The main camera containing stage elements.
+   * This includes the current character being edited.
+   */
+  public var camGame:FunkinCamera;
+
+  /**
+   * The camera containing all UI elements.
+   */
+  public var camHUD:FunkinCamera;
+
+  var activeToolboxes:Map<String, CharacterEditorBaseToolbox> = new Map<String, CharacterEditorBaseToolbox>();
+
+  /**
    * Whether the user is focused on an input in the Haxe UI, and inputs are being fed into it.
    * If the user clicks off the input, focus will leave.
    */
@@ -48,9 +75,6 @@ class CharacterEditorState extends UIState
   {
     return FocusManager.instance.focus != null;
   }
-
-  var camGame:FunkinCamera;
-  var camHUD:FunkinCamera;
 
   override public function create():Void
   {
@@ -68,6 +92,11 @@ class CharacterEditorState extends UIState
     FlxG.cameras.reset(camGame);
     FlxG.cameras.add(camHUD, false);
 
+    camFollow = new FlxObject(0, 0, 1, 1);
+    camFollow.screenCenter();
+    add(camFollow);
+    camGame.follow(camFollow, LOCKON);
+
     super.create();
 
     this.root.scrollFactor.set();
@@ -80,19 +109,47 @@ class CharacterEditorState extends UIState
 
     this.setupStage(null);
     this.setupCharacter('bf');
+    this.setupUIListeners();
 
     Cursor.show();
     FunkinSound.playMusic('chartEditorLoop', {
       startingVolume: 0.0
     });
     FlxG.sound.music.fadeIn(10, 0, 1);
+
+    CharacterEditorWelcomeDialog.build(this);
+  }
+
+  function setupUIListeners():Void
+  {
+    menubarItemToggleToolboxStage.onChange = event -> this.setToolboxState('ToolboxStage', event.value);
   }
 
   override public function update(elapsed:Float):Void
   {
-    MouseUtil.mouseCamDrag();
-    if (!isHaxeUIFocused) MouseUtil.mouseWheelZoom();
+    if (!isHaxeUIFocused)
+    {
+      var point:FlxPoint = camFollow.getPosition(FlxPoint.weak());
+      MouseUtil.mouseCamDrag(point);
+      camFollow.setPosition(point.x, point.y);
+      point.put();
+
+      MouseUtil.mouseWheelZoom();
+    }
 
     super.update(elapsed);
+  }
+
+  /**
+   * Reset the camera to focus on its default target.
+   */
+  public function resetCamera():Void
+  {
+    if (character != null)
+    {
+      camFollow.setPosition(character.cameraFocusPoint.x, character.cameraFocusPoint.y);
+    }
+
+    camGame.zoom = currentStage?.camZoom ?? 1.0;
   }
 }

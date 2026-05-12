@@ -183,8 +183,7 @@ class Save implements ConsoleClass
         gfChar: "gf",
         dadChar: "dad"
       },
-      optionsCameraEditor:
-      {
+      optionsCameraEditor: {
         previousFiles: [],
         theme: ChartEditorTheme.Light,
       }
@@ -373,7 +372,6 @@ class Save implements ConsoleClass
   ///
   @:saveProperty(data.optionsCameraEditor.previousFiles, [])
   public var cameraEditorPreviousFiles:SaveProperty<Array<String>>;
-
   @:saveProperty(data.optionsCameraEditor.hasBackup, false)
   public var cameraEditorHasBackup:SaveProperty<Bool>;
 

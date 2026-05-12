@@ -3,8 +3,8 @@ package funkin.ui.debug.character;
 import funkin.data.stage.StageData;
 import flixel.util.FlxColor;
 import funkin.play.stage.Stage;
-import flixel.math.FlxMath;
 import flixel.addons.display.FlxGridOverlay;
+import openfl.display.BitmapData;
 import flixel.addons.display.FlxBackdrop;
 
 /**
@@ -36,37 +36,17 @@ class CheckerboardStage extends Stage
 
   override function buildStage():Void
   {
-    bg = new FlxBackdrop(FlxGridOverlay.createGrid(CELL_SIZE, CELL_SIZE, Std.int(CELL_SIZE * 2), Std.int(CELL_SIZE * 2), true, CELL_COLOR_1, CELL_COLOR_2));
+    var bitmap:BitmapData = FlxGridOverlay.createGrid(CELL_SIZE, CELL_SIZE, FlxG.width, FlxG.height, true, CELL_COLOR_1, CELL_COLOR_2);
+
+    bg = new FlxBackdrop(bitmap);
     bg.zIndex = 0;
-    // add(bg);
+    add(bg);
   }
 
   override function _fetchData(_):Null<StageData>
   {
-    final stageData:StageData = new StageData();
-
-    stageData.characters = {
-      bf: {
-        zIndex: 300,
-        position: [989.5, 885],
-        scroll: [1, 1],
-        cameraOffsets: [-100, -100]
-      },
-      dad: {
-        zIndex: 200,
-        position: [335, 885],
-        scroll: [1, 1],
-        cameraOffsets: [150, -100]
-      },
-      gf: {
-        zIndex: 100,
-        cameraOffsets: [0, 0],
-        scroll: [1, 1],
-        position: [751.5, 787]
-      }
-    };
-
-    return stageData;
+    // Use `mainStage` data to prevent a crash.
+    return super._fetchData('mainStage');
   }
 
   override public function update(elapsed:Float):Void

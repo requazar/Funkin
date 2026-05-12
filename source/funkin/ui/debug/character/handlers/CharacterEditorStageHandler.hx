@@ -13,8 +13,13 @@ class CharacterEditorStageHandler
   {
     if (instance.currentStage != null)
     {
+      if (instance.currentStage.id == stageId || (stageId == null && instance.currentStage == checkerboardStage)) return;
+
       if (instance.character != null)
       {
+        // Make sure that shaders don't move over between stages.
+        instance.character.shader = null;
+
         instance.currentStage.remove(instance.character);
         instance.currentStage.characters.clear();
       }
@@ -39,6 +44,9 @@ class CharacterEditorStageHandler
 
     if (instance.currentStage == null) return;
 
+    final DIRECTORY:String = instance.currentStage?._data?.directory ?? 'shared';
+    Paths.setCurrentLevel(DIRECTORY);
+
     instance.currentStage.revive();
 
     ScriptEventDispatcher.callEvent(instance.currentStage, new ScriptEvent(CREATE, false));
@@ -49,11 +57,13 @@ class CharacterEditorStageHandler
       instance.currentStage.addCharacter(instance.character, instance.character.characterType);
       instance.currentStage.refresh();
     }
+
+    instance.resetCamera();
   }
 
   public static function setupCharacter(instance:CharacterEditorState, characterId:Null<String>):Void
   {
-    var charType:Null<CharacterType> = instance.character?.characterType ?? CharacterType.DAD;
+    var charType:Null<CharacterType> = instance.character?.characterType ?? CharacterEditorState.DEFAULT_CHARACTER_POSITION;
 
     if (instance.character != null)
     {
@@ -73,6 +83,24 @@ class CharacterEditorStageHandler
       instance.currentStage.addCharacter(instance.character, charType);
       instance.currentStage.refresh();
     }
+
+    instance.resetCamera();
+  }
+
+  public static function moveCharStagePosition(instance:CharacterEditorState, charType:Null<CharacterType>, ?force:Bool = false):Void
+  {
+    if (instance.character?.characterType == charType && !force) return;
+
+    // Make sure that shaders don't move over.
+    instance.character.shader = null;
+
+    instance.currentStage.remove(instance.character);
+    instance.currentStage.characters.clear();
+
+    instance.currentStage.addCharacter(instance.character, charType ?? CharacterEditorState.DEFAULT_CHARACTER_POSITION);
+    instance.currentStage.refresh();
+
+    instance.resetCamera();
   }
 
   static var checkerboardStage:Null<CheckerboardStage>;

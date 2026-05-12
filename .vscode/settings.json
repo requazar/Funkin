@@ -130,11 +130,6 @@
       "args": ["-debug", "-DSTAGEBUILD", "-DFEATURE_DEBUG_FUNCTIONS"]
     },
     {
-      "label": "Windows / Debug (Straight to Character Editor)",
-      "target": "windows",
-      "args": ["-debug", "-DCHARDEBUG", "-DFEATURE_DEBUG_FUNCTIONS"]
-    },
-    {
       "label": "Windows / Debug (Debug hxvlc)",
       "target": "windows",
       "args": ["-debug", "-DHXVLC_LOGGING", "-DFEATURE_DEBUG_FUNCTIONS"]
@@ -168,6 +163,10 @@
     {
       "label": "Debug (Straight to Chart Editor)",
       "args": ["-debug", "-DCHARTING", "-DFEATURE_DEBUG_FUNCTIONS"]
+    },
+    {
+      "label": "Debug (Straight to Character Editor)",
+      "args": ["-debug", "-DCHARDEBUG", "-DFEATURE_DEBUG_FUNCTIONS"]
     },
     { "label": "Release", "args": ["-release"] },
     {
