@@ -12,6 +12,7 @@ class CharacterEditorBaseDialog extends Dialog
     super();
 
     this.instance = instance;
+    instance.isHaxeUIDialogOpen = true;
 
     this.onDialogClosed = event -> onClose(event);
     this.destroyOnClose = true;
@@ -24,6 +25,6 @@ class CharacterEditorBaseDialog extends Dialog
    */
   public function onClose(event:DialogEvent):Void
   {
-    // TODO
+    instance.isHaxeUIDialogOpen = false;
   }
 }

@@ -1,6 +1,7 @@
 package funkin.ui.debug.character;
 
 import funkin.ui.debug.character.dialogs.CharacterEditorWelcomeDialog;
+import funkin.ui.debug.character.dialogs.CharacterEditorAnimationSelector;
 import flixel.math.FlxPoint;
 import funkin.play.stage.Stage;
 import funkin.graphics.FunkinCamera;
@@ -41,6 +42,22 @@ class CharacterEditorState extends UIState
   public var character:BaseCharacter;
 
   /**
+   * The data of the character that is currently being edited.
+   */
+  public var characterData:Null<CharacterData>;
+
+  function get_characterData():Null<CharacterData>
+  {
+    @:privateAccess
+    return character?._data;
+  }
+
+  /**
+   * The onion skin shown behind the current character.
+   */
+  public var onionSkin:OnionSkin;
+
+  /**
    * The current stage that the character is contained in.
    *
    * This will be a checkerboard pattern by default.
@@ -63,7 +80,8 @@ class CharacterEditorState extends UIState
    */
   public var camHUD:FunkinCamera;
 
-  var activeToolboxes:Map<String, CharacterEditorBaseToolbox> = new Map<String, CharacterEditorBaseToolbox>();
+  var activeToolboxes:Map<CharacterEditorToolbox, CharacterEditorBaseToolbox> = new Map<CharacterEditorToolbox, CharacterEditorBaseToolbox>();
+  var animationSelector:CharacterEditorAnimationSelector;
 
   /**
    * Whether the user is focused on an input in the Haxe UI, and inputs are being fed into it.
@@ -75,6 +93,11 @@ class CharacterEditorState extends UIState
   {
     return FocusManager.instance.focus != null;
   }
+
+  /**
+   * If a HaxeUI dialog is currently open.
+   */
+  var isHaxeUIDialogOpen:Bool = false;
 
   override public function create():Void
   {
@@ -97,6 +120,8 @@ class CharacterEditorState extends UIState
     add(camFollow);
     camGame.follow(camFollow, LOCKON);
 
+    onionSkin = new OnionSkin(this);
+
     super.create();
 
     this.root.scrollFactor.set();
@@ -108,7 +133,6 @@ class CharacterEditorState extends UIState
     Screen.instance.addComponent(root);
 
     this.setupStage(null);
-    this.setupCharacter('bf');
     this.setupUIListeners();
 
     Cursor.show();
@@ -122,12 +146,29 @@ class CharacterEditorState extends UIState
 
   function setupUIListeners():Void
   {
-    menubarItemToggleToolboxStage.onChange = event -> this.setToolboxState('ToolboxStage', event.value);
+    menubarItemNewChar.onClick = _ -> CharacterEditorWelcomeDialog.build(this);
+
+    menubarItemToggleToolboxData.onChange = event -> this.setToolboxState(Metadata, event.value);
+    menubarItemToggleToolboxAnims.onChange = event -> this.setToolboxState(Animations, event.value);
+    menubarItemToggleToolboxDeath.onChange = event -> this.setToolboxState(DeathProperties, event.value);
+    menubarItemToggleToolboxStage.onChange = event -> this.setToolboxState(StagePreview, event.value);
+
+    playbarAnimName.onClick = _ ->
+    {
+      if (animationSelector == null)
+      {
+        animationSelector = new CharacterEditorAnimationSelector(this);
+      }
+      else
+      {
+        animationSelector.show();
+      }
+    };
   }
 
   override public function update(elapsed:Float):Void
   {
-    if (!isHaxeUIFocused)
+    if (!isHaxeUIFocused && !isHaxeUIDialogOpen)
     {
       var point:FlxPoint = camFollow.getPosition(FlxPoint.weak());
       MouseUtil.mouseCamDrag(point);
@@ -135,8 +176,22 @@ class CharacterEditorState extends UIState
       point.put();
 
       MouseUtil.mouseWheelZoom();
-    }
 
+      // TODO: move this into an updateInput function
+      if (FlxG.keys.justPressed.F)
+      {
+        onionSkin.visible = !onionSkin.visible;
+        if (onionSkin.visible) onionSkin.createOnionSkin();
+      }
+    }
+    @:privateAccess
+    if (character != null)
+    {
+      playbarAnimName.text = character.getCurrentAnimation();
+      playbarAnimOffsets.text = '[${character.animOffsets.join(', ')}]';
+
+      playbarGlobalOffsets.text = '[${character.globalOffsets.join(', ')}]';
+    }
     super.update(elapsed);
   }
 

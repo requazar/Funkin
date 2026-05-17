@@ -15,14 +15,7 @@ class CharacterEditorStageHandler
     {
       if (instance.currentStage.id == stageId || (stageId == null && instance.currentStage == checkerboardStage)) return;
 
-      if (instance.character != null)
-      {
-        // Make sure that shaders don't move over between stages.
-        instance.character.shader = null;
-
-        instance.currentStage.remove(instance.character);
-        instance.currentStage.characters.clear();
-      }
+      removeCharacterFromStage(instance);
 
       var event:ScriptEvent = new ScriptEvent(DESTROY, false);
       ScriptEventDispatcher.callEvent(instance.currentStage, event);
@@ -44,21 +37,15 @@ class CharacterEditorStageHandler
 
     if (instance.currentStage == null) return;
 
-    final DIRECTORY:String = instance.currentStage?._data?.directory ?? 'shared';
-    Paths.setCurrentLevel(DIRECTORY);
+    var directory:String = instance.currentStage?._data?.directory ?? 'shared';
+    Paths.setCurrentLevel(directory);
 
     instance.currentStage.revive();
 
     ScriptEventDispatcher.callEvent(instance.currentStage, new ScriptEvent(CREATE, false));
     instance.add(instance.currentStage);
 
-    if (instance.character != null)
-    {
-      instance.currentStage.addCharacter(instance.character, instance.character.characterType);
-      instance.currentStage.refresh();
-    }
-
-    instance.resetCamera();
+    addCharacterToStage(instance);
   }
 
   public static function setupCharacter(instance:CharacterEditorState, characterId:Null<String>):Void
@@ -67,9 +54,6 @@ class CharacterEditorStageHandler
 
     if (instance.character != null)
     {
-      instance.currentStage.remove(instance.character);
-      instance.currentStage.characters.clear();
-
       ScriptEventDispatcher.callEvent(instance.character, new ScriptEvent(DESTROY, false));
 
       instance.character.kill();
@@ -80,8 +64,8 @@ class CharacterEditorStageHandler
     if (characterId != null)
     {
       instance.character = CharacterDataParser.fetchCharacter(characterId, true);
-      instance.currentStage.addCharacter(instance.character, charType);
-      instance.currentStage.refresh();
+      instance.character.characterType = charType;
+      addCharacterToStage(instance);
     }
 
     instance.resetCamera();
@@ -91,15 +75,35 @@ class CharacterEditorStageHandler
   {
     if (instance.character?.characterType == charType && !force) return;
 
-    // Make sure that shaders don't move over.
-    instance.character.shader = null;
+    removeCharacterFromStage(instance);
+    instance.character.characterType = charType ?? CharacterEditorState.DEFAULT_CHARACTER_POSITION;
+    addCharacterToStage(instance);
+  }
 
-    instance.currentStage.remove(instance.character);
+  public static function removeCharacterFromStage(instance:CharacterEditorState):Void
+  {
+    if (instance.character != null)
+    {
+      // Make sure that shaders don't move over.
+      instance.character.shader = null;
+
+      instance.currentStage.remove(instance.character);
+    }
+
+    instance.currentStage.remove(instance.onionSkin);
     instance.currentStage.characters.clear();
+  }
 
-    instance.currentStage.addCharacter(instance.character, charType ?? CharacterEditorState.DEFAULT_CHARACTER_POSITION);
+  public static function addCharacterToStage(instance:CharacterEditorState):Void
+  {
+    if (instance.character == null) return;
+
+    instance.currentStage.addCharacter(instance.character, instance.character.characterType);
+
+    instance.onionSkin.zIndex = instance.character.zIndex - 1;
+    instance.currentStage.add(instance.onionSkin);
+
     instance.currentStage.refresh();
-
     instance.resetCamera();
   }
 
