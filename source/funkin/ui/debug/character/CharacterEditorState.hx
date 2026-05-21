@@ -1,14 +1,9 @@
 package funkin.ui.debug.character;
 
-import funkin.ui.debug.character.dialogs.CharacterEditorWelcomeDialog;
-import funkin.ui.debug.character.dialogs.CharacterEditorAnimationSelector;
 import flixel.math.FlxPoint;
 import funkin.play.stage.Stage;
 import funkin.graphics.FunkinCamera;
 import funkin.util.WindowUtil;
-import funkin.play.character.BaseCharacter;
-import funkin.data.character.CharacterData;
-import funkin.ui.debug.character.toolboxes.CharacterEditorBaseToolbox;
 import haxe.ui.containers.windows.WindowManager;
 import haxe.ui.backend.flixel.UIState;
 import haxe.ui.focus.FocusManager;
@@ -80,8 +75,8 @@ class CharacterEditorState extends UIState
    */
   public var camHUD:FunkinCamera;
 
-  var activeToolboxes:Map<CharacterEditorToolbox, CharacterEditorBaseToolbox> = new Map<CharacterEditorToolbox, CharacterEditorBaseToolbox>();
-  var animationSelector:CharacterEditorAnimationSelector;
+  var activeToolboxes:Map<CharacterEditorToolbox, BaseToolbox> = new Map<CharacterEditorToolbox, BaseToolbox>();
+  var animationSelector:AnimationSelector;
 
   /**
    * Whether the user is focused on an input in the Haxe UI, and inputs are being fed into it.
@@ -114,6 +109,7 @@ class CharacterEditorState extends UIState
 
     FlxG.cameras.reset(camGame);
     FlxG.cameras.add(camHUD, false);
+    FlxG.cameras.setDefaultDrawTarget(camGame, true);
 
     camFollow = new FlxObject(0, 0, 1, 1);
     camFollow.screenCenter();
@@ -129,7 +125,7 @@ class CharacterEditorState extends UIState
     this.root.width = FlxG.width;
     this.root.height = FlxG.height;
 
-    WindowManager.instance.container = root;
+    // WindowManager.instance.container = root;
     Screen.instance.addComponent(root);
 
     this.setupStage(null);
@@ -141,29 +137,22 @@ class CharacterEditorState extends UIState
     });
     FlxG.sound.music.fadeIn(10, 0, 1);
 
-    CharacterEditorWelcomeDialog.build(this);
+    WelcomeDialog.build(this);
   }
 
   function setupUIListeners():Void
   {
-    menubarItemNewChar.onClick = _ -> CharacterEditorWelcomeDialog.build(this);
+    menubarItemNewChar.onClick = _ -> WelcomeDialog.build(this);
+    menubarItemAbout.onClick = _ -> AboutDialog.build(this);
+
+    menubarItemOnionSkin.onChange = event -> this.setOnionSkin(event.value);
 
     menubarItemToggleToolboxData.onChange = event -> this.setToolboxState(Metadata, event.value);
     menubarItemToggleToolboxAnims.onChange = event -> this.setToolboxState(Animations, event.value);
     menubarItemToggleToolboxDeath.onChange = event -> this.setToolboxState(DeathProperties, event.value);
     menubarItemToggleToolboxStage.onChange = event -> this.setToolboxState(StagePreview, event.value);
 
-    playbarAnimName.onClick = _ ->
-    {
-      if (animationSelector == null)
-      {
-        animationSelector = new CharacterEditorAnimationSelector(this);
-      }
-      else
-      {
-        animationSelector.show();
-      }
-    };
+    playbarAnimName.onClick = _ -> this.showAnimationSelector();
   }
 
   override public function update(elapsed:Float):Void
@@ -178,21 +167,33 @@ class CharacterEditorState extends UIState
       MouseUtil.mouseWheelZoom();
 
       // TODO: move this into an updateInput function
-      if (FlxG.keys.justPressed.F)
-      {
-        onionSkin.visible = !onionSkin.visible;
-        if (onionSkin.visible) onionSkin.createOnionSkin();
-      }
+      if (FlxG.keys.justPressed.F) menubarItemOnionSkin.selected = !menubarItemOnionSkin.selected;
     }
     @:privateAccess
     if (character != null)
     {
       playbarAnimName.text = character.getCurrentAnimation();
-      playbarAnimOffsets.text = '[${character.animOffsets.join(', ')}]';
-
-      playbarGlobalOffsets.text = '[${character.globalOffsets.join(', ')}]';
     }
     super.update(elapsed);
+  }
+
+  override public function destroy():Void
+  {
+    Cursor.hide();
+    super.destroy();
+  }
+
+  function setOnionSkin(visible:Bool):Void
+  {
+    if (visible) onionSkin.createOnionSkin();
+    onionSkin.visible = visible;
+  }
+
+  function showAnimationSelector():Void
+  {
+    if (animationSelector == null) animationSelector = new AnimationSelector(this);
+    animationSelector.show();
+    animationSelector.refresh();
   }
 
   /**

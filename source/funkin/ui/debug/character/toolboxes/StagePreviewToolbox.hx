@@ -8,7 +8,7 @@ import funkin.data.stage.StageRegistry;
  * Stage Preview Toolbox for the Character Editor.
  */
 @:access(funkin.ui.debug.character.CharacterEditorState) @:build(haxe.ui.ComponentBuilder.build('assets/exclude/data/ui/character-editor/toolboxes/stage-preview.xml'))
-class CharacterEditorStagePreviewToolbox extends CharacterEditorBaseToolbox
+class StagePreviewToolbox extends BaseToolbox
 {
   /**
    * Names to use in the character position dropdown.
@@ -30,17 +30,8 @@ class CharacterEditorStagePreviewToolbox extends CharacterEditorBaseToolbox
 
   function initCallbacks():Void
   {
-    toolboxStageSelected.onChange = _ ->
-    {
-      characterEditorState.setupStage(toolboxStageSelected.value.id);
-      trace('oh yeah we definitely changed the stage to ${toolboxStageSelected.value.id} trust!!');
-    };
-
-    toolboxStageCharPos.onChange = _ ->
-    {
-      characterEditorState.moveCharStagePosition(toolboxStageCharPos.value.id);
-      trace('oh yeah we definitely changed the char pos to ${toolboxStageCharPos.value.id} trust!!');
-    };
+    toolboxStageSelected.onChange = _ -> characterEditorState.setupStage(toolboxStageSelected.value.id);
+    toolboxStageCharPos.onChange = _ -> characterEditorState.moveCharStagePosition(toolboxStageCharPos.value.id);
 
     toolboxStagePosMarker.onChange = event ->
     {

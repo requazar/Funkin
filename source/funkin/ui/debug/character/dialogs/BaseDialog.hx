@@ -3,7 +3,7 @@ package funkin.ui.debug.character.dialogs;
 import haxe.ui.containers.dialogs.Dialog;
 
 @:access(funkin.ui.debug.character.CharacterEditorState)
-class CharacterEditorBaseDialog extends Dialog
+class BaseDialog extends Dialog
 {
   var instance:CharacterEditorState;
 

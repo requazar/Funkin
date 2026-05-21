@@ -7,7 +7,7 @@ import funkin.data.character.CharacterData.CharacterDataParser;
 import funkin.data.stage.StageRegistry;
 
 @:access(funkin.play.stage.Stage)
-class CharacterEditorStageHandler
+class StageHandler
 {
   public static function setupStage(instance:CharacterEditorState, stageId:Null<String>):Void
   {

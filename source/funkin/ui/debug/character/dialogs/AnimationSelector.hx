@@ -5,7 +5,8 @@ import haxe.ui.focus.FocusManager;
 import haxe.ui.core.Screen;
 import haxe.ui.containers.ListView;
 
-class CharacterEditorAnimationSelector extends ListView
+@:access(funkin.ui.debug.character.CharacterEditorState)
+class AnimationSelector extends ListView
 {
   var instance:CharacterEditorState;
 
@@ -20,8 +21,7 @@ class CharacterEditorAnimationSelector extends ListView
     x = 5;
     y = instance.playbar.screenTop - height - 5;
 
-    refresh();
-    show();
+    hide();
 
     registerEvent(FocusEvent.FOCUS_OUT, onFocusOut);
     onChange = _ -> instance.character.playAnimation(selectedItem, true);
@@ -46,7 +46,6 @@ class CharacterEditorAnimationSelector extends ListView
 
   override public function show():Void
   {
-    @:privateAccess
     instance.isHaxeUIDialogOpen = true;
     FocusManager.instance.focus = this;
 
@@ -55,7 +54,6 @@ class CharacterEditorAnimationSelector extends ListView
 
   override public function hide():Void
   {
-    @:privateAccess
     instance.isHaxeUIDialogOpen = false;
 
     super.hide();
@@ -63,7 +61,6 @@ class CharacterEditorAnimationSelector extends ListView
 
   function onFocusOut(e:FocusEvent):Void
   {
-    trace('focused out');
     hide();
   }
 }

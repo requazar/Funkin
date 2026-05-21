@@ -6,7 +6,7 @@ import haxe.ui.components.Link;
 import funkin.util.SortUtil;
 
 @:build(haxe.ui.ComponentBuilder.build('assets/exclude/data/ui/character-editor/dialogs/welcome.xml'))
-class CharacterEditorWelcomeDialog extends CharacterEditorBaseDialog
+class WelcomeDialog extends BaseDialog
 {
   public function new(characterEditor:CharacterEditorState)
   {
@@ -41,7 +41,7 @@ class CharacterEditorWelcomeDialog extends CharacterEditorBaseDialog
 
   public static function build(instance:CharacterEditorState, ?modal:Bool = true):Void
   {
-    var dialog:CharacterEditorWelcomeDialog = new CharacterEditorWelcomeDialog(instance);
+    var dialog:WelcomeDialog = new WelcomeDialog(instance);
     dialog.showDialog(modal);
   }
 }

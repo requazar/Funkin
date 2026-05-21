@@ -6,7 +6,7 @@ import haxe.ui.containers.dialogs.CollapsibleDialog;
  * The base class for the Toolboxes (manipulatable, arrangeable control windows) in the Character Editor.
  */
 @:access(funkin.ui.debug.charting.CharacterEditorState)
-class CharacterEditorBaseToolbox extends CollapsibleDialog
+class BaseToolbox extends CollapsibleDialog
 {
   var characterEditorState:CharacterEditorState;
 
